@@ -2,7 +2,7 @@
 
 双击手机电源键，直接打开 **Google 钱包刷卡页面**。Windows 图形工具内置 ADB 和手机插件，可安装、激活、检查状态或恢复原快捷键，无需 root。
 
-Shizuku下载地址：https://github.com/RikkaApps/Shizuku
+## 你会用到的Shizuku！https://github.com/RikkaApps/Shizuku
 
 本仓库基于 [DustinYe/PowerWallet](https://github.com/DustinYe/PowerWallet) 的 MIT 源码修改。原项目只验证了小米 13 Ultra（ishtar）；本 fork 在 **REDMI Turbo 4 Pro（onyx）** 上完成了兼容性、锁屏流程、响应速度、手机端界面和 **Shizuku 免电脑激活** 的适配与真机验证。**红米 Turbo 4 Pro 已验证**，并保留小米 13 Ultra 的原验证路径。理论上支持澎湃系统全系，但是未测试。
 
