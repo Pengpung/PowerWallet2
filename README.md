@@ -1,8 +1,8 @@
-# PowerWallet · 电源键钱包（红米 Turbo 4 Pro 适配 fork）
+# PowerWallet · 电源键钱包
 
 双击手机电源键，直接打开 **Google 钱包刷卡页面**。Windows 图形工具内置 ADB 和手机插件，可安装、激活、检查状态或恢复原快捷键，无需 root。
 
-本仓库基于 [DustinYe/PowerWallet](https://github.com/DustinYe/PowerWallet) 的 MIT 源码修改。原项目只验证了小米 13 Ultra（ishtar）；本 fork 在 **REDMI Turbo 4 Pro（onyx）** 上完成了兼容性、锁屏流程、响应速度、手机端界面和 **Shizuku 免电脑激活** 的适配与真机验证。**红米 Turbo 4 Pro 已验证**，并保留小米 13 Ultra 的原验证路径。
+本仓库基于 [DustinYe/PowerWallet](https://github.com/DustinYe/PowerWallet) 的 MIT 源码修改。原项目只验证了小米 13 Ultra（ishtar）；本 fork 在 **REDMI Turbo 4 Pro（onyx）** 上完成了兼容性、锁屏流程、响应速度、手机端界面和 **Shizuku 免电脑激活** 的适配与真机验证。**红米 Turbo 4 Pro 已验证**，并保留小米 13 Ultra 的原验证路径。理论上支持澎湃系统全系，但是未测试。
 
 - 版本：桌面端 **2.0.0**，手机插件 **2.0.0**（versionCode 6）
 - applicationId：`cn.peng.powerwallet`
@@ -121,14 +121,13 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\desktop\build.ps1
 
 ## 限制
 
-- **Shizuku 必须保持运行并授权**，手机端免电脑激活/恢复才可用。Shizuku 未运行且助手已停止时，仍需连接电脑恢复。
+- **Shizuku 必须保持运行并授权**，手机端免电脑激活/恢复才可用。没有Shizuku且助手已停止时，仍需连接电脑恢复。经测试，只要不手动停止Shizuku，就可以一直存在。
 - **手机重启后助手停止**：可用 Shizuku 或电脑重新激活；这是无 root 设计，助手没有开机自启。
-- **开发者选项/USB 调试**：建议保持开启。关闭后系统清理进程可能导致助手停止，双击失效；但可以用 Shizuku 重新激活。
+- **开发者选项/USB 调试**：建议保持开启。除非您的设备是红米T4P，经过测试可以关闭开发者选项。
 - **普通应用不能写快捷键设置**：HyperOS SettingsProvider 拒绝普通应用写 `double_click_power_key`，即使授予 `WRITE_SETTINGS` / `WRITE_SECURE_SETTINGS`。因此助手死亡后的自动恢复依赖 Shizuku 的 shell 身份，而不是应用自身权限。
 - HyperOS 大版本更新可能改变双击电源键实现；失效时先「停用并恢复」，再重新激活。
 - 需要手机已安装并完成 Google 钱包设置；支付仍由 Google 钱包和系统验证处理。
-- 真机未测试真实 NFC 读卡器付款。
-- 液态玻璃/高斯模糊是后续“最好”项，当前版本未实现。
+- 真机已通过真实 NFC 读卡器付款。
 
 ## 原项目文档
 
