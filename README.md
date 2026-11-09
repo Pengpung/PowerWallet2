@@ -125,7 +125,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\desktop\build.ps1
 
 - **Shizuku 必须保持运行并授权**，手机端免电脑激活/恢复才可用。没有Shizuku且助手已停止时，仍需连接电脑恢复。经测试，只要不手动停止Shizuku，就可以一直存在。
 - **手机重启后助手停止**：可用 Shizuku 或电脑重新激活；这是无 root 设计，助手没有开机自启。
-- **开发者选项/USB 调试**：建议保持开启。除非您的设备是红米T4P，经过测试可以关闭开发者选项。
+- **开发者选项/USB 调试**：建议保持开启。除非您的设备是红米T4P，经过测试可以关闭开发者选项。但是不稳定，过几十分钟Shizuku会被杀掉。
 - **普通应用不能写快捷键设置**：HyperOS SettingsProvider 拒绝普通应用写 `double_click_power_key`，即使授予 `WRITE_SETTINGS` / `WRITE_SECURE_SETTINGS`。因此助手死亡后的自动恢复依赖 Shizuku 的 shell 身份，而不是应用自身权限。
 - HyperOS 大版本更新可能改变双击电源键实现；失效时先「停用并恢复」，再重新激活。
 - 需要手机已安装并完成 Google 钱包设置；支付仍由 Google 钱包和系统验证处理。
