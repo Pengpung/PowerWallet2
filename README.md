@@ -8,7 +8,7 @@
 
 - 版本：桌面端 **2.0.0**，手机插件 **2.0.0**（versionCode 6）
 - applicationId：`cn.peng.powerwallet`
-- 旧包名 `cn.haiyu.powerwallet` 的安装会在桌面端激活时自动迁移
+- 基石项目的包名 `cn.haiyu.powerwallet` 的安装会在桌面端激活时自动迁移
 
 ## 已验证设备
 
