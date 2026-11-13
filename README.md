@@ -17,7 +17,7 @@ Shizuku 下载：[RikkaApps/Shizuku](https://github.com/RikkaApps/Shizuku)。除
 | 机型 | REDMI Turbo 4 Pro（`25053RT47C`） |
 | 设备代号 | `onyx` |
 | 系统 | HyperOS `OS4.0.2.0.XOLCNXM`（当前实测，通用模式；原验证 OS3.0.306.0.WOLCNXM） |
-| Android | 16 / SDK 36 |
+| Android | 17 / SDK 37 |
 | 电源键设备 | `/dev/input/event2`（`pmic_pwrkey`） |
 | Google 钱包 | `com.google.android.apps.walletnfcrel` |
 
