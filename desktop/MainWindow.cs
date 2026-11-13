@@ -37,10 +37,10 @@ namespace PowerWallet {
         private string preference="system",lastDevice="";
         private string restoreFeedback="";
         public const string Repository="https://github.com/DustinYe/PowerWallet";
-        private static readonly string Preferences=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"PowerWallet","theme.txt");
+        private static readonly string Preferences=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"MiGoo","theme.txt");
 
         public MainWindow(bool testing) {
-            testMode=testing;Title="PowerWallet · 电源键钱包";Width=920;Height=760;
+            testMode=testing;Title="MiGoo · 电源键钱包";Width=920;Height=760;
             MinWidth=480;MinHeight=420;WindowStartupLocation=WindowStartupLocation.CenterScreen;
             FontFamily=new FontFamily("Microsoft YaHei UI, Segoe UI");FontSize=14;
             UseLayoutRounding=true;SnapsToDevicePixels=true;
@@ -104,7 +104,7 @@ namespace PowerWallet {
             var top=header;top.Margin=new Thickness(24,18,24,14);DockPanel.SetDock(top,Dock.Top);dock.Children.Add(top);
             var brand=new StackPanel{Orientation=Orientation.Horizontal,Margin=new Thickness(0,0,24,8)};
             var logo=Text("⏻",27,"Accent");logo.Margin=new Thickness(0,0,10,0);brand.Children.Add(logo);
-            var name=Text("PowerWallet",23,"Ink");name.FontWeight=FontWeights.SemiBold;brand.Children.Add(name);top.Children.Add(brand);
+            var name=Text("MiGoo",23,"Ink");name.FontWeight=FontWeights.SemiBold;brand.Children.Add(name);top.Children.Add(brand);
             var themes=new StackPanel{Orientation=Orientation.Horizontal,Margin=new Thickness(0,0,0,8),VerticalAlignment=VerticalAlignment.Center};top.Children.Add(themes);
             foreach(var option in new[]{new[]{"system","跟随系统"},new[]{"dark","深色"},new[]{"light","浅色"}}) {
                 string mode=option[0];var b=new Button{Content=option[1],FontSize=12,Padding=new Thickness(10,6,10,6),MinHeight=34,Margin=new Thickness(0,0,5,0)};
@@ -156,10 +156,10 @@ namespace PowerWallet {
             dock.Height=width<440 && height<400?400:Math.Max(220,height);UpdateScreenInfo();
         }
         private void UpdateScreenInfo() {
-            if(testMode){screenInfo.Text="Windows x64 · 手机插件 2.0.0 · 分辨率与缩放自适应";return;}
+            if(testMode){screenInfo.Text="Windows x64 · 手机插件 "+Assets.Version+" · 分辨率与缩放自适应";return;}
             var source=PresentationSource.FromVisual(this);
             double scale=source==null || source.CompositionTarget==null?1:source.CompositionTarget.TransformToDevice.M11;
-            screenInfo.Text="桌面版 2.0.0 · 手机插件 2.0.0 · 当前缩放 "+Math.Round(scale*100)+"%";
+            screenInfo.Text="MiGoo 桌面版 "+Assets.Version+" · 手机插件 "+Assets.Version+" · 当前缩放 "+Math.Round(scale*100)+"%";
         }
         public void ShowPhone(PhoneInfo value) {
             phone=value;
@@ -172,7 +172,7 @@ namespace PowerWallet {
                     statusPill.Text="已停用";heading.Text=restoreFeedback.Contains("保留")?"已停用，保留当前设置":"已恢复原快捷键";description.Text=restoreFeedback+"。需要再次使用时，点击“安装并激活”。";
                 }
             }
-            deviceInfo.Text=phone.Device!=null && phone.Device.State=="device"?phone.DisplayModel+" · Android "+phone.Android+"\n"+phone.Rom:"电脑会自动检测已连接的 Android 手机。";
+            deviceInfo.Text=phone.Device!=null && phone.Device.State=="device"?phone.DisplayModel+" · Android "+phone.Android+"\n"+phone.Rom+"\nShizuku："+(phone.ShizukuRunning?"运行中 · 手机端可免电脑激活":"未运行"):"电脑会自动检测已连接的 Android 手机。";
             support.Text=phone.Device!=null && phone.Device.State=="device"?(phone.Supported?(phone.Verified?"✓ 此机型和系统版本已验证":"⚠ HyperOS 通用模式 · 未逐一验证；会备份原快捷键，可随时停用恢复"):"支持范围：HyperOS 设备 · 小米 13 Ultra / 红米 Turbo 4 Pro 已验证"):"无需 root · 内置 ADB · 建议保持开发者选项/USB 调试开启";
             support.SetResourceReference(TextBlock.ForegroundProperty,phone.Device!=null && phone.Device.State=="device" && (!phone.Supported || !phone.Verified)?"Warn":"Muted");
             ActivateButton.IsEnabled=!busy && controller!=null && phone.CanActivate;

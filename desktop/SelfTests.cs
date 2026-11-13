@@ -76,6 +76,7 @@ namespace PowerWallet {
             Check(stopped>=0 && installed>stopped && pushed>installed && started>pushed,"activation stops, installs, deploys, then starts in order");
             Check(fake.Calls.FindLastIndex(x=>x.Contains("--status"))>started,"live status is checked after starting the helper");
             Check(WalletController.Redact("TEST001 "+Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),Device()).IndexOf("TEST001",StringComparison.Ordinal)<0,"diagnostic output hides device serial");
+            Check(BuildInfo.Version==Assets.Version && BuildInfo.ApkName==Assets.ApkName && Assets.Names.Contains(Assets.ApkName),"version metadata and embedded APK are consistent");
             foreach(string asset in Assets.Names)Check(Assets.Read(asset).Length>0,"embedded asset "+asset);
             double[][] screens={new double[]{800,600,1},new double[]{800,600,1.25},new double[]{1024,768,1.5},new double[]{1280,720,1},new double[]{1280,720,1.5},new double[]{1280,720,2},new double[]{1366,768,1},new double[]{1366,768,1.25},new double[]{1366,768,2},new double[]{1920,1080,1},new double[]{1920,1080,1.25},new double[]{1920,1080,1.5},new double[]{1920,1080,2},new double[]{2560,1440,1.5},new double[]{2560,1440,2},new double[]{3200,2000,2},new double[]{3200,2000,2.5},new double[]{3840,2160,2},new double[]{3840,2160,3}};
             foreach(string theme in new[]{"dark","light"}) {

@@ -2,6 +2,8 @@ package cn.peng.powerwallet;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
@@ -26,6 +28,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.io.*;
@@ -44,7 +47,9 @@ public class MainActivity extends Activity {
     private TextView brandName,eyebrow,title,subtitle;
     private TextView statusPill,statusTitle,statusDetail,refreshLink;
     private TextView openButton,refreshButton,restoreButton;
-    private TextView shizukuTitle,shizukuStatus,shizukuButton,shizukuHint;
+    private TextView shizukuTitle,shizukuStatus,shizukuButton,shizukuHint,shizukuLog;
+    private Switch autoWatchdog;
+    private boolean watchdogGuard;
     private TextView infoTitle,steps,footer,keepWarning;
     private ProgressBar progress;
     private int statusTone;
@@ -99,7 +104,7 @@ public class MainActivity extends Activity {
         logo.setImageResource(powerIcon!=0?powerIcon:android.R.drawable.ic_lock_power_off);
         logo.setImageTintList(ColorStateList.valueOf(p.accent));
         brand.addView(logo,new LinearLayout.LayoutParams(dp(26),dp(26)));
-        brandName=text("PowerWallet",22,p.ink,true);
+        brandName=text("MiGoo",22,p.ink,true);
         LinearLayout.LayoutParams nameLp=new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT);
         nameLp.leftMargin=dp(8);
         brand.addView(brandName,nameLp);
@@ -208,6 +213,20 @@ public class MainActivity extends Activity {
         LinearLayout.LayoutParams hintLp=new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
         hintLp.topMargin=dp(8);
         shizukuCard.addView(shizukuHint,hintLp);
+        shizukuLog=text("查看诊断日志",12,p.accent,true);
+        shizukuLog.setPadding(0,dp(10),0,dp(2));
+        shizukuLog.setClickable(true);shizukuLog.setFocusable(true);
+        shizukuLog.setOnClickListener(v->showDiagnostics());
+        shizukuCard.addView(shizukuLog);
+        autoWatchdog=new Switch(this);
+        autoWatchdog.setText("后台自动恢复（Shizuku）");
+        autoWatchdog.setTextSize(13);
+        autoWatchdog.setTextColor(p.ink);
+        autoWatchdog.setChecked(getSharedPreferences("migoo",0).getBoolean("watchdog",false));
+        autoWatchdog.setOnCheckedChangeListener((button,checked)->toggleWatchdog(checked));
+        LinearLayout.LayoutParams watchLp=new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
+        watchLp.topMargin=dp(6);
+        shizukuCard.addView(autoWatchdog,watchLp);
 
         infoCard=new LinearLayout(this);
         infoCard.setOrientation(LinearLayout.VERTICAL);
@@ -230,7 +249,7 @@ public class MainActivity extends Activity {
         keepLp.topMargin=dp(12);
         infoCard.addView(keepWarning,keepLp);
 
-        footer=text("PowerWallet "+versionName()+" · 双击轻触震动",11,p.muted,false);
+        footer=text("MiGoo "+versionName()+" · 双击轻触震动",11,p.muted,false);
         footer.setGravity(Gravity.CENTER);
         LinearLayout.LayoutParams footerLp=new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
         footerLp.topMargin=dp(18);
@@ -308,6 +327,8 @@ public class MainActivity extends Activity {
             shizukuCard.setBackground(shape(p.card,18,dp(1),p.line));
             shizukuTitle.setTextColor(p.ink);
             shizukuHint.setTextColor(p.muted);
+            shizukuLog.setTextColor(p.accent);
+            autoWatchdog.setTextColor(p.ink);
             refreshShizuku();
         }
         styleThemeChips();
@@ -386,7 +407,7 @@ public class MainActivity extends Activity {
     private int dp(int value) {return Math.round(value*getResources().getDisplayMetrics().density);}
     private String versionName() {
         try {return getPackageManager().getPackageInfo(getPackageName(),0).versionName;}
-        catch(Exception e) {return "2.0.0";}
+        catch(Exception e) {return "2.1.3";}
     }
 
     private void refreshShizuku() {
@@ -428,8 +449,67 @@ public class MainActivity extends Activity {
             try {result=ShizukuBridge.activate(ShizukuBridge.readOwnApk(this));}
             catch(Exception e) {result="未激活\n"+e.getMessage();}
             final String value=result;
-            runOnUiThread(() -> {busy=false;setBusy(false);refreshShizuku();showStatus(value);});
+            runOnUiThread(() -> {
+                busy=false;setBusy(false);refreshShizuku();showStatus(value);
+                if(autoWatchdog!=null && autoWatchdog.isChecked() && value.startsWith("已激活"))
+                    new Thread(() -> ShizukuBridge.startWatchdog()).start();
+            });
         },"shizuku-activate").start();
+    }
+    private void showDiagnostics() {
+        if(!ShizukuBridge.available() || !ShizukuBridge.authorized()) {
+            Toast.makeText(this,"需要 Shizuku 授权才能读取日志",Toast.LENGTH_SHORT).show();
+            return;
+        }
+        new Thread(() -> {
+            String log=ShizukuBridge.logTail();
+            runOnUiThread(() -> {
+                String message=log==null || log.trim().isEmpty()?"暂无日志。":log.trim();
+                AlertDialog dialog=new AlertDialog.Builder(this,dialogTheme())
+                    .setTitle("诊断日志")
+                    .setMessage(message)
+                    .setPositiveButton("复制",(d,w)->copyLog(message))
+                    .setNegativeButton("关闭",null)
+                    .create();
+                dialog.setOnShowListener(x->{
+                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(p.accent);
+                    dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(p.muted);
+                });
+                dialog.show();
+            });
+        },"migoo-log").start();
+    }
+    private void copyLog(String text) {
+        ClipboardManager manager=(ClipboardManager)getSystemService(CLIPBOARD_SERVICE);
+        if(manager!=null) manager.setPrimaryClip(ClipData.newPlainText("MiGoo log",text));
+        Toast.makeText(this,"日志已复制",Toast.LENGTH_SHORT).show();
+    }
+    private void toggleWatchdog(boolean enabled) {
+        if(watchdogGuard) return;
+        if(enabled) {
+            if(!ShizukuBridge.available()) {
+                Toast.makeText(this,"请先启动 Shizuku",Toast.LENGTH_SHORT).show();
+                resetWatchdogSwitch();return;
+            }
+            if(!ShizukuBridge.authorized()) {
+                ShizukuBridge.requestPermission(SHIZUKU_REQUEST);
+                Toast.makeText(this,"请先允许 Shizuku 授权",Toast.LENGTH_SHORT).show();
+                resetWatchdogSwitch();return;
+            }
+            getSharedPreferences("migoo",0).edit().putBoolean("watchdog",true).apply();
+            new Thread(() -> {
+                String result=ShizukuBridge.startWatchdog();
+                runOnUiThread(() -> Toast.makeText(this,result,Toast.LENGTH_SHORT).show());
+            },"migoo-watchdog").start();
+        } else {
+            getSharedPreferences("migoo",0).edit().putBoolean("watchdog",false).apply();
+            new Thread(() -> ShizukuBridge.stopWatchdog(),"migoo-watchdog").start();
+        }
+    }
+    private void resetWatchdogSwitch() {
+        watchdogGuard=true;
+        if(autoWatchdog!=null) autoWatchdog.setChecked(false);
+        watchdogGuard=false;
     }
     private void openShizuku() {
         Intent intent=getPackageManager().getLaunchIntentForPackage("moe.shizuku.privileged.api");
@@ -478,6 +558,8 @@ public class MainActivity extends Activity {
         refreshButton.setAlpha(value?0.5f:1f);
         restoreButton.setAlpha(value?0.5f:1f);
         if(shizukuButton!=null) {shizukuButton.setEnabled(!value);shizukuButton.setAlpha(value?0.5f:1f);}
+        if(shizukuLog!=null) {shizukuLog.setEnabled(!value);shizukuLog.setAlpha(value?0.5f:1f);}
+        if(autoWatchdog!=null) autoWatchdog.setEnabled(!value);
     }
     private void showStatus(String reply) {
         String first=reply==null?"":reply.trim(),second="";
@@ -540,3 +622,4 @@ public class MainActivity extends Activity {
         }
     }
 }
+

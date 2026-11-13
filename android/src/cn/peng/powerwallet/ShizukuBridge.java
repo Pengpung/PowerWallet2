@@ -102,4 +102,29 @@ final class ShizukuBridge {
         try {return run(RUN+"--stop",null);}
         catch(Exception e) {return "";}
     }
+    static String logTail() {
+        try {return run("tail -n 20 /data/local/tmp/powerwallet.log 2>/dev/null",null);}
+        catch(Exception e) {return "";}
+    }
+    static String startWatchdog() {
+        String script="#!/system/bin/sh\n"+
+            "while true; do\n"+
+            "  if ! CLASSPATH="+JAR+" /system/bin/app_process /system/bin cn.peng.powerwallet.Helper --status >/dev/null 2>&1; then\n"+
+            "    if [ -x /system/bin/setsid ]; then CLASSPATH="+JAR+" setsid nohup /system/bin/app_process /system/bin cn.peng.powerwallet.Helper </dev/null >>/data/local/tmp/powerwallet.log 2>&1 & else CLASSPATH="+JAR+" nohup /system/bin/app_process /system/bin cn.peng.powerwallet.Helper </dev/null >>/data/local/tmp/powerwallet.log 2>&1 & fi\n"+
+            "  fi\n"+
+            "  sleep 60\n"+
+            "done\n";
+        try {
+            run("if [ -f /data/local/tmp/migoo-watchdog.pid ]; then kill $(cat /data/local/tmp/migoo-watchdog.pid) 2>/dev/null; rm -f /data/local/tmp/migoo-watchdog.pid; fi",null);
+            run("cat > /data/local/tmp/migoo-watchdog.sh",script.getBytes("UTF-8"));
+            run("chmod 700 /data/local/tmp/migoo-watchdog.sh; if [ -x /system/bin/setsid ]; then setsid nohup /system/bin/sh /data/local/tmp/migoo-watchdog.sh </dev/null >>/data/local/tmp/powerwallet.log 2>&1 & else nohup /system/bin/sh /data/local/tmp/migoo-watchdog.sh </dev/null >>/data/local/tmp/powerwallet.log 2>&1 & fi; echo $! > /data/local/tmp/migoo-watchdog.pid",null);
+            return "自动恢复已开启";
+        } catch(Exception e) {return "自动恢复启动失败："+e.getMessage();}
+    }
+    static String stopWatchdog() {
+        try {
+            run("if [ -f /data/local/tmp/migoo-watchdog.pid ]; then kill $(cat /data/local/tmp/migoo-watchdog.pid) 2>/dev/null; rm -f /data/local/tmp/migoo-watchdog.pid; fi",null);
+            return "自动恢复已关闭";
+        } catch(Exception e) {return "自动恢复关闭失败："+e.getMessage();}
+    }
 }

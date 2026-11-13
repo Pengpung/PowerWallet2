@@ -44,9 +44,9 @@ namespace PowerWallet {
         }
     }
     public static class Assets {
-        public const string ApkName="PowerWallet-2.0.0.apk";
-        public const string Version="2.0.0";
-        public static string DirectoryPath { get { return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"PowerWallet","assets","desktop-"+Version); } }
+        public const string ApkName=BuildInfo.ApkName;
+        public const string Version=BuildInfo.Version;
+        public static string DirectoryPath { get { return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"MiGoo","assets","desktop-"+Version); } }
         public static readonly string[] Names={"adb.exe","AdbWinApi.dll","AdbWinUsbApi.dll",ApkName,"NOTICE.txt","source.properties"};
         public static string Hash(byte[] data) { using(var sha=SHA256.Create()) return BitConverter.ToString(sha.ComputeHash(data)).Replace("-","").ToLowerInvariant(); }
         public static byte[] Read(string name) {
@@ -74,7 +74,7 @@ namespace PowerWallet {
     public sealed class PhoneInfo {
         public Device Device;
         public string Product="", Rom="", Android="", Status="", Reason="", MarketName="", MiOs="";
-        public bool Supported, Verified, WalletInstalled, Active, CurrentHelper, HasBackup;
+        public bool Supported, Verified, WalletInstalled, Active, CurrentHelper, HasBackup, ShizukuRunning;
         public bool CanActivate {get{return Device!=null && Device.State=="device" && Supported && WalletInstalled;}}
         public string DisplayModel {
             get {
@@ -143,6 +143,8 @@ namespace PowerWallet {
                 (IsHyperOs(phone.Rom) || (!String.IsNullOrEmpty(phone.MiOs) && phone.MiOs.StartsWith("OS",StringComparison.OrdinalIgnoreCase))));
             var wallet=Shell(d,"pm path com.google.android.apps.walletnfcrel");
             phone.WalletInstalled=wallet.ExitCode==0 && wallet.Output.StartsWith("package:",StringComparison.Ordinal);
+            var shizuku=Shell(d,"pidof shizuku_server");
+            phone.ShizukuRunning=shizuku.ExitCode==0 && !String.IsNullOrWhiteSpace(shizuku.Output);
             phone.HasBackup=Read(d,"if [ -f /data/local/tmp/powerwallet-state.properties ]; then echo yes; fi")=="yes";
             var hash=Shell(d,"sha256sum "+HelperJar+" 2>/dev/null");
             phone.CurrentHelper=hash.ExitCode==0 && hash.Output.StartsWith(apkHash+" ",StringComparison.OrdinalIgnoreCase);
@@ -178,7 +180,7 @@ namespace PowerWallet {
             MigrateLegacy(d);
             log("正在停止旧助手，保存的原快捷键不会丢失…");
             Shell(d,"if [ -f "+HelperJar+" ]; then CLASSPATH="+HelperJar+" app_process /system/bin cn.peng.powerwallet.Helper --stop >/dev/null 2>&1; fi");
-            log("正在安装手机插件 2.0.0…");
+            log("正在安装手机插件 "+Assets.Version+"…");
             var install=DeviceCommand(d,120000,"install","-r",apkPath);
             if(install.Output.Contains("INSTALL_FAILED_UPDATE_INCOMPATIBLE")) {
                 log("检测到旧签名的手机插件，正在卸载旧版后重新安装…");

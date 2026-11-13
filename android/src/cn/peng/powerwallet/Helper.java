@@ -134,7 +134,7 @@ public final class Helper {
         // Keep the original validated path, and allow other HyperOS builds to use
         // the same reversible mechanism. Non-HyperOS firmware is still refused.
         if(!verified && (build==null || !build.startsWith("OS")))
-            throw new IOException("PowerWallet requires HyperOS; device="+device+" build="+build);
+            throw new IOException("MiGoo requires HyperOS; device="+device+" build="+build);
         System.out.println("DEVICE device="+device+" build="+build+(verified?" verified":" unverified-hyperos"));
         server=new LocalServerSocket(MainActivity.SOCKET); // Exclusive instance before any changes.
         String packages=command("/system/bin/cmd","package","list","packages","-U", "cn.peng.powerwallet");
@@ -147,7 +147,7 @@ public final class Helper {
         original=props.getProperty("original");
         if(original==null || !MARKER.equals(setting())) original=setting();
         props.setProperty("original",original); props.setProperty("device",inputPath);
-        try(FileOutputStream out=new FileOutputStream(STATE)){props.store(out,"PowerWallet reversible shortcut backup");}
+        try(FileOutputStream out=new FileOutputStream(STATE)){props.store(out,"MiGoo reversible shortcut backup");}
         STATE.setReadable(false,false); STATE.setReadable(true,true); STATE.setWritable(false,false); STATE.setWritable(true,true);
         reader=new ProcessBuilder("/system/bin/getevent","-lt",inputPath).redirectErrorStream(true).start();
         Thread.sleep(100);
@@ -175,7 +175,7 @@ public final class Helper {
         Class<?> amClass=Class.forName("android.app.IActivityManager");
         activityManager=Class.forName("android.app.ActivityManager").getMethod("getService").invoke(null);
         Object holder=amClass.getMethod("getContentProviderExternal",String.class,int.class,IBinder.class,String.class)
-            .invoke(activityManager,"cn.peng.powerwallet.bridge",0,providerToken,"PowerWallet");
+            .invoke(activityManager,"cn.peng.powerwallet.bridge",0,providerToken,"MiGoo");
         if(holder==null) throw new IOException("Companion provider is unavailable");
         Object provider=holder.getClass().getField("provider").get(holder);
         companionProvider=provider;

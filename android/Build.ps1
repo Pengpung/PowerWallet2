@@ -1,8 +1,8 @@
 ﻿param(
     [string]$Sdk = "$env:LOCALAPPDATA\Android\Sdk",
     [string]$Jdk = "$env:USERPROFILE\.jdks\jbr-21.0.11",
-    [string]$BuildDirectory = "$env:TEMP\PowerWallet-build",
-    [string]$ApkPath = "$PSScriptRoot\..\PowerWallet-2.0.0.apk"
+    [string]$BuildDirectory = "$env:TEMP\MiGoo-build",
+    [string]$ApkPath = "$PSScriptRoot\..\MiGoo-Android.apk"
 )
 $ErrorActionPreference = 'Stop'
 $env:JAVA_HOME = $Jdk
@@ -28,7 +28,10 @@ CheckExit
 CheckExit
 & "$bt\aapt2.exe" compile --dir "$PSScriptRoot\res" -o "$BuildDirectory\res.zip"
 CheckExit
-& "$bt\aapt2.exe" link -I $androidJar --manifest "$PSScriptRoot\AndroidManifest.xml" -o "$BuildDirectory\unsigned.apk" "$BuildDirectory\res.zip"
+$vp=[xml](Get-Content -LiteralPath "$PSScriptRoot\..\version.props" -Raw)
+$appVersion=$vp.Project.PropertyGroup.MiGooVersion
+$appVersionCode=$vp.Project.PropertyGroup.MiGooVersionCode
+& "$bt\aapt2.exe" link -I $androidJar --manifest "$PSScriptRoot\AndroidManifest.xml" --version-code $appVersionCode --version-name $appVersion -o "$BuildDirectory\unsigned.apk" "$BuildDirectory\res.zip"
 CheckExit
 & "$Jdk\bin\jar.exe" uf "$BuildDirectory\unsigned.apk" -C "$BuildDirectory\dex" classes.dex
 CheckExit

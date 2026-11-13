@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <MiGooVersion>2.1.3</MiGooVersion>
+    <MiGooVersionCode>7</MiGooVersionCode>
+    <MiGooApkName>MiGoo-Android.apk</MiGooApkName>
+    <MiGooExeName>MiGoo-Windows.exe</MiGooExeName>
+  </PropertyGroup>
+</Project>
+
+

@@ -21,7 +21,7 @@ namespace PowerWallet {
         [DllImport("user32.dll")] static extern bool ShowWindow(IntPtr hwnd,int command);
         public static void FocusExisting() {
             foreach(var process in System.Diagnostics.Process.GetProcesses()) {
-                try{if(process.MainWindowTitle=="PowerWallet · 电源键钱包"){ShowWindow(process.MainWindowHandle,9);SetForegroundWindow(process.MainWindowHandle);return;}}catch(InvalidOperationException){}
+                try{if(process.MainWindowTitle=="MiGoo · 电源键钱包"){ShowWindow(process.MainWindowHandle,9);SetForegroundWindow(process.MainWindowHandle);return;}}catch(InvalidOperationException){}
             }
         }
         public static void DarkTitle(Window window,bool dark) {int value=dark?1:0;var hwnd=new WindowInteropHelper(window).Handle;if(hwnd!=IntPtr.Zero)DwmSetWindowAttribute(hwnd,20,ref value,4);}

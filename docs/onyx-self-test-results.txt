@@ -23,10 +23,11 @@ PASS validated build activates through the original path
 PASS activation stops, installs, deploys, then starts in order
 PASS live status is checked after starting the helper
 PASS diagnostic output hides device serial
+PASS version metadata and embedded APK are consistent
 PASS embedded asset adb.exe
 PASS embedded asset AdbWinApi.dll
 PASS embedded asset AdbWinUsbApi.dll
-PASS embedded asset PowerWallet-2.0.0.apk
+PASS embedded asset MiGoo-Android.apk
 PASS embedded asset NOTICE.txt
 PASS embedded asset source.properties
 PASS window fits 800x600x1 dark
@@ -447,4 +448,4 @@ PASS action fits horizontally 打开手机插件 3840x2160x3 light
 PASS action is visible or vertically reachable 打开手机插件 3840x2160x3 light
 PASS action stays visible on compact screen 打开手机插件 3840x2160x3 light
 PASS no horizontal scrolling 3840x2160x3 light
-449 checks passed; 38 theme / display combinations; no phone required.
+450 checks passed; 38 theme / display combinations; no phone required.

@@ -20,7 +20,7 @@
 
 ## 深色模式与屏幕适配
 
-顶部可选择跟随系统、深色或浅色。选择会保存在当前 Windows 用户的 `%LOCALAPPDATA%\PowerWallet\theme.txt`。
+顶部可选择跟随系统、深色或浅色。选择会保存在当前 Windows 用户的 `%LOCALAPPDATA%\MiGoo\theme.txt`。
 
 程序读取显示器工作区与缩放比例，不更改系统分辨率。窗口会限制在可用工作区内，在不同 DPI 显示器间移动时重新检查尺寸。较窄窗口会换行排列操作按钮；可用高度较小时可滚动访问内容。
 
@@ -36,6 +36,9 @@
 
 ## 本地文件
 
-EXE 首次运行会把 ADB、USB DLL、APK 与许可声明解包到当前用户的 `%LOCALAPPDATA%\PowerWallet\assets\desktop-2.0.0`，后续会核对内容哈希。无需管理员权限。
+EXE 首次运行会把 ADB、USB DLL、APK 与许可声明解包到当前用户的 `%LOCALAPPDATA%\MiGoo\assets\desktop-2.1.3`，后续会核对内容哈希。无需管理员权限。
 
 手机端助手与快捷键备份位于 `/data/local/tmp/powerwallet-*`。操作日志只在电脑窗口中显示，不上传外网。APK 不读取银行卡信息。
+
+
+
