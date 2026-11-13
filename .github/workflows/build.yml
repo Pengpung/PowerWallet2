@@ -1,0 +1,40 @@
+name: build
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+      - name: Install Android SDK
+        shell: pwsh
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+      - name: Build APK
+        shell: pwsh
+        run: .\android\Build.ps1 -Sdk $env:ANDROID_HOME -Jdk $env:JAVA_HOME -BuildDirectory build -ApkPath desktop/assets/MiGoo-Android.apk
+      - name: Build EXE
+        shell: pwsh
+        run: .\desktop\build.ps1 -OutputDirectory dist
+      - name: Self-test
+        shell: pwsh
+        run: |
+          $p = Start-Process -FilePath "dist\MiGoo-Windows.exe" -ArgumentList "--self-test", "selftest" -Wait -PassThru
+          if ($p.ExitCode -ne 0) {
+            Get-Content "selftest\failure.txt" -ErrorAction SilentlyContinue
+            exit 1
+          }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MiGoo
+          path: |
+            dist/MiGoo-Windows.exe
+            desktop/assets/MiGoo-Android.apk
+            selftest/test-results.txt
